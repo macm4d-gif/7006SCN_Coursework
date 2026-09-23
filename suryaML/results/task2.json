@@ -1,0 +1,17 @@
+{
+  "algorithms": [
+    {
+      "name": "LogisticRegression",
+      "metrics": {
+        "auc_roc": 0.8134
+      }
+    },
+    {
+      "name": "RandomForestClassifier",
+      "metrics": {
+        "auc_roc": 0.8612
+      }
+    }
+  ],
+  "recommended_model": "GBTClassifier"
+}

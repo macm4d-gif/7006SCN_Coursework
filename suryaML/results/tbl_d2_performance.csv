@@ -1,0 +1,5 @@
+Model,Family,AUC_ROC,AUC_PR,F1_Score,Accuracy,Training_Time_Sec
+Logistic Regression,Linear/GL,0.8134,0.7245,0.7398,0.7423,187.0
+Random Forest,Tree Ensemble,0.8612,0.7934,0.7856,0.7891,1247.0
+Linear SVC,Distance/Kernel,0.8267,0.7412,0.7489,0.7512,312.0
+GBT Classifier,Boosting,0.8689,0.8012,0.7912,0.7934,2834.0

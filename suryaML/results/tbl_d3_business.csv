@@ -1,0 +1,6 @@
+Distance_Bucket,High_Tip_Probability,Average_Fare_USD,Trip_Volume_Millions
+0-2 miles,0.221,9.80,28.3
+2-5 miles,0.284,16.50,22.1
+5-10 miles,0.357,28.30,12.4
+10-20 miles,0.412,45.70,5.2
+20+ miles,0.389,72.10,1.8

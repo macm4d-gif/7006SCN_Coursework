@@ -1,0 +1,12 @@
+{
+  "pool_reference": "TR-04",
+  "dataset_name": "NYC Yellow Taxi Trip Records 2019",
+  "big_data_verification": {
+    "row_count": 84368012,
+    "column_count": 18,
+    "file_size_gib": 25.7,
+    "rows_gte_10m": true,
+    "columns_gte_10": true,
+    "partition_count": 128
+  }
+}

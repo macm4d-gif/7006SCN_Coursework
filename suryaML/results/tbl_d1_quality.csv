@@ -1,0 +1,13 @@
+Feature,Missing_Pct,Distinct_Values,Data_Type
+fare_amount,0.0,4821,Numeric
+trip_distance,0.0,3200,Numeric
+passenger_count,0.1,7,Numeric
+tip_amount,0.0,3100,Numeric
+PULocationID,0.0,263,Spatial/Cat
+DOLocationID,0.0,264,Spatial/Cat
+congestion_surcharge,2.1,4,Numeric
+extra,0.0,6,Numeric
+mta_tax,0.0,2,Numeric
+tolls_amount,0.0,85,Numeric
+RatecodeID,0.2,7,Categorical
+trip_duration_min,0.0,1800,Numeric

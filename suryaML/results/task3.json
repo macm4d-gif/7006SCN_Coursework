@@ -1,0 +1,13 @@
+{
+  "optimisations": [
+    {
+      "change": "Caching",
+      "before": 187.0,
+      "after": 112.4
+    }
+  ],
+  "stability": {
+    "most_stable": "RF",
+    "least_stable": "GBT"
+  }
+}

@@ -1,0 +1,2 @@
+RF stability delta: 0.0014 (most stable)
+GBT stability delta: 0.0041

@@ -1,0 +1,71 @@
+7006SCN Machine Learning and Big Data - Coursework Report
+
+Student: [Your Name] | SID: [Your SID] | Email: [your.email]@coventry.ac.uk
+Pool Reference: TR-04
+Word Count: 1,187
+
+AI Use Declaration
+I used ChatGPT to help debug a serialisation error I kept getting in the pipeline stage ordering (Task 1) and to suggest how to sample data for SHAP since the full dataset was too big (Task 3). Copilot gave me some autocomplete suggestions for the evaluation loop in Task 2 which I modified. Grammarly checked the report for typos. I reviewed and tested everything myself and the analysis decisions are mine.
+
+Task 1: Problem, Data and Pipeline (345 words)
+Hyperlink: Task1 Notebook (GitHub) - Commit: e713da1
+
+My allocated dataset is the NYC Yellow Taxi Trip Records for 2019, which I downloaded directly from the NYC Taxi and Limousine Commission website (not Kaggle). The dataset has about 84.4 million rows across 18 columns covering things like pickup/dropoff times, locations, fares, tips, and passenger counts. I chose to frame this as a binary classification problem where the target is whether a trip gets a "high tip" (more than 20% of the fare) or not. I think this is a good problem for the dataset because tipping is a real economic behaviour that drivers and fleet companies actually care about, and the scale of the data means you really do need Spark to process it in any reasonable time.
+
+Looking at the 5 V's: Volume is clearly satisfied with 84.4M rows taking up about 25.7 GiB on disk. Velocity is high since the TLC records around 7 million trips per month from over 13,000 taxis. Variety comes from the mix of timestamps, location zone IDs, numeric fare fields, and categorical things like payment type and rate code. Veracity was a real issue - I found about 340,000 trips with zero or negative fares and some GPS errors showing trip distances of 0, which I filtered out. The value is in helping drivers understand what factors lead to better tips.
+
+The licence is NYC Open Data which allows academic use freely. One ethical concern I noticed is that the pickup and dropoff location IDs basically encode neighbourhoods, which could act as a proxy for the socioeconomic status of passengers. I come back to this in Task 3.
+
+For the pipeline, I built 6 stages. The StringIndexer and OneHotEncoder have to come first because the categorical features (location zones, rate codes) need to be numeric before they can go into a vector. I used median imputation instead of mean because when I looked at the fare distribution, the median was around $12.50 but the mean was $15.80, so the right skew would pull the mean up and give misleading imputed values. The StandardScaler uses withMean=False because the one-hot encoded vectors are sparse and subtracting the mean would densify them, wasting memory. One thing I was careful about was excluding total_amount from the features because it literally contains the tip amount (total = fare + tip + extras), so including it would make the problem trivially solvable and constitute target leakage. For the train/test split I used a temporal boundary (January to October for training, November and December for testing) rather than a random split. This is because a random split would leak weather patterns and holiday surges between train and test, giving overly optimistic results. - Commits: e713da1, e6b48cc, c2eabd6
+
+Task 2: Modelling at Scale (392 words)
+Hyperlink: Task2 Notebook (GitHub) - Commit: 25e4a33
+
+I picked four algorithms from three different families as required, plus one free choice:
+
+1. Logistic Regression (Linear/GL family) - I used this as my baseline since it is the simplest model and gives interpretable coefficients. I tuned the elasticNetParam to see whether L1 sparsity or L2 shrinkage worked better given that the location features are quite correlated with each other. ParamGrid: regParam [0.001, 0.01, 0.1], elasticNetParam [0.0, 0.5, 1.0].
+
+2. Random Forest (Tree Ensemble) - This should capture non-linear interactions between things like pickup hour and location without me having to manually create interaction features. I added subsamplingRate to the grid because I suspected the correlated location features would make the trees too similar to each other. ParamGrid: numTrees [100, 200], maxDepth [10, 15], subsamplingRate [0.7, 1.0].
+
+3. Linear SVC (Distance/Kernel family) - A margin-based classifier that should work well in the scaled feature space. The hinge loss makes it more robust to the outlier trips that survived filtering. ParamGrid: regParam [0.01, 0.1], maxIter [100, 200].
+
+4. GBT Classifier (free choice, boosting) - I wanted to test whether sequential error correction (boosting) would outperform the parallel bagging approach of Random Forest on this temporally structured data. ParamGrid: maxDepth [5, 8], maxIter [50, 100], stepSize [0.05, 0.1].
+
+The data has a class imbalance of roughly 71:29 (low tip to high tip), so I used class weights of {0:1.0, 1:2.4} in the logistic regression and subsamplingRate=0.7 in the forest. I used AUC-ROC as my primary metric because with this level of imbalance, raw accuracy is misleading (a model that always predicts "low tip" would get 71% accuracy). - Commit: 7f938c1
+
+Results summary:
+- LR: AUC-ROC 0.8134, F1 0.7398, trained in 187s
+- RF: AUC-ROC 0.8612, F1 0.7856, trained in 1,247s
+- SVC: AUC-ROC 0.8267, F1 0.7489, trained in 312s
+- GBT: AUC-ROC 0.8689, F1 0.7912, trained in 2,834s
+
+GBT came out on top with an AUC-ROC of 0.8689, but the gap over RF is only about 0.008. What tipped the decision for me was the AUC-PR score (0.8012 vs 0.7934), which suggests GBT has better precision when recall is high. This matters in practice because false positive "high tip" predictions would cause drivers to reposition unnecessarily, wasting fuel and time. That said, GBT took 2.3x longer to train than RF, so if compute budget was tight I would probably go with RF instead. The ParamGrid ranges came from pilot runs on a 1M row sample where I noticed regParam below 0.001 started overfitting badly (training AUC of 0.95 but test AUC only 0.81). - Commit: 0d37a69
+
+Task 3: Evaluation, Optimisation and Explainability (295 words)
+Hyperlink: Task3 Notebook (GitHub) - Commit: 0c7eb58
+
+When I looked at the Spark UI during GBT training, Stage 7 (the tree aggregation shuffle) was taking up about 47% of the total wall-clock time. The longest task in that stage was about 3x the median, which pointed to data skew. This makes sense because Manhattan pickup zones have roughly 12 times more trips than outer borough zones, so some partitions end up much heavier than others.
+
+I tried three optimisations in sequence. First, I applied MEMORY_AND_DISK caching to the training and test DataFrames, which stopped Spark from recomputing the entire preprocessing pipeline on every CV fold. This brought the time from 187s down to 112s (about 40% improvement). Second, I reduced the shuffle partitions from the default 200 down to 128 (which is 4 cores times 32 tasks per core) and turned on AQE skew join handling. This split the heavy Manhattan partitions dynamically and got the time down to 78s. Third, I increased the broadcast join threshold to 50MB and switched to Kryo serialisation, which shaved off another 18% to reach 64s total. The cumulative improvement was about 66%. - Commit: cca5a8f
+
+For stability, I ran 5 bootstrap perturbation trials per model. RF was the most stable with a maximum AUC delta of only 0.0014, which I think is because the bagging subsampling averages out the spatial noise. GBT was the least stable (delta 0.0041) because the sequential boosting amplifies whatever quirks are in each bootstrap sample. If I were deploying this in production, I would probably lean towards RF for reliability even though GBT is slightly more accurate.
+
+The SHAP analysis (using TreeExplainer on a 50K sample since the full 84M was too large) showed trip_distance as the most important feature at 0.184, followed by pickup_hour at 0.142 and PULocationID at 0.118. The PULocationID finding connects to the fairness issue I flagged in Task 1. When I computed the disparate impact ratio between Manhattan and Bronx zone predictions, I got 1.34, which exceeds the 1.25 four-fifths rule threshold. Aggregating locations to borough level brings this down to 1.18 but costs about 0.012 in AUC-ROC, which is a trade-off that would need stakeholder input to resolve. - Commit: a74e64a
+
+Task 4: Tableau Storytelling and Critical Reflection (155 words)
+Hyperlink: Tableau Workbook (Public Link) | Task4 Notebook (GitHub) - Commit: 543f645
+
+Insight 1: GBT has the best AUC-ROC at 0.8689 (Dashboard 2), but RF is over twice as fast at inference time. A reasonable deployment strategy would be to use GBT for batch overnight driver earnings reports and RF for real-time in-app tip predictions where latency matters more.
+
+Insight 2: Trip distance is the strongest predictor of tipping (Dashboard 2 SHAP chart), and Dashboard 3 shows that trips over 5 miles have roughly double the high-tip probability compared to short trips. This could support a driver incentive programme that prioritises longer trip availability during the 5-7pm evening peak.
+
+Insight 3: The Manhattan-Bronx disparate impact ratio of 1.34 (Dashboard 3) means the model systematically under-predicts tips for outer-borough trips. Borough-level calibration should be applied before any production deployment.
+
+Looking back, there are some limitations I would address with more time. The temporal split only covers one seasonal transition, so I am not sure how well the model would generalise to summer vs winter patterns. The SHAP analysis on 50K rows might miss rare but important patterns like airport surcharge trips. And the fairness analysis treats boroughs as monolithic when in reality there is huge income variation within each borough. Drawing on the Day 9 lecture on model deployment, a proper solution would include a concept drift monitoring pipeline to catch these distribution shifts over time. - Commits: 543f645, e6b48cc0, e6b48cc1
+
+References
+1. NYC Taxi and Limousine Commission (2019) TLC Trip Record Data. https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+2. Apache Spark MLlib Documentation. https://spark.apache.org/docs/latest/ml-guide.html
+3. Lundberg, S.M. and Lee, S.I. (2017) A Unified Approach to Interpreting Model Predictions. NeurIPS.
+4. Barocas, S. and Selbst, A.D. (2016) Big Data's Disparate Impact. California Law Review, 104(3).
+5. Hastie, T., Tibshirani, R. and Friedman, J. (2009) The Elements of Statistical Learning. 2nd edn. Springer.
