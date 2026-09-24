@@ -1,0 +1,56 @@
+{
+  "student": {
+    "name": "REPLACE_WITH_YOUR_NAME",
+    "email": "REPLACE_WITH_YOUR_STUDENT_EMAIL",
+    "sid": "REPLACE_WITH_YOUR_SID"
+  },
+  "allocation": {
+    "pool_reference": "TR-04",
+    "confirmed_against_aula_register": false,
+    "dataset_name": "2019 NYC TLC Yellow Taxi Trip Records",
+    "source_page": "https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page",
+    "licence_or_terms_url": "REPLACE_WITH_VERIFIED_TERMS_URL_FROM_YOUR_ALLOCATION",
+    "licence_checked": false,
+    "ethical_note": "Credit-card tips are recorded; unreported cash tips and location proxy risk limit generalisation. Edit after reviewing the source terms."
+  },
+  "paths": {
+    "raw_dir": "data/raw",
+    "zone_lookup": "data/raw/taxi_zone_lookup.csv",
+    "processed_dir": "data/processed/taxi2019",
+    "artifact_dir": "artifacts",
+    "results_dir": "results"
+  },
+  "spark": {
+    "master": "local[*]",
+    "driver_memory": "8g",
+    "executor_memory": "8g",
+    "executor_cores": 4,
+    "executor_instances": null,
+    "shuffle_partitions": 128,
+    "local_dir": "",
+    "event_log_dir": "",
+    "timezone": "America/New_York"
+  },
+  "model": {
+    "cv_folds": 3,
+    "cv_parallelism": 2,
+    "tuning_fraction": 0.08,
+    "seed": 314159,
+    "curve_bins": 150,
+    "stability_fraction": 0.03,
+    "stability_subsample_fraction": 0.95,
+    "stability_trials": 3,
+    "run_retraining_stability": false,
+    "test_perturbation_fraction": 0.20,
+    "lime_background_rows": 300,
+    "lime_background_fraction": 0.0005,
+    "lime_num_samples": 500,
+    "minimum_borough_size": 1000
+  },
+  "tableau": {
+    "public_workbook_url": "",
+    "published_four_dashboards_verified": false,
+    "hourly_cluster_cost_usd": null,
+    "cluster_cost_source": ""
+  }
+}

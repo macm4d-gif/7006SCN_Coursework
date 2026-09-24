@@ -1,0 +1,13 @@
+# Tested target: Python 3.10-3.12, Java 11 or 17; see README for Spark version on your cluster.
+pyspark>=3.5.3,<4
+numpy>=1.24,<2.0
+pandas>=2.0,<3
+pyarrow>=12,<21
+matplotlib>=3.7,<4
+Pillow>=10,<12
+lime>=0.2.0.1,<0.3
+requests>=2.31,<3
+jupyterlab>=4.0,<5
+nbformat>=5,<6
+python-docx>=1.1,<2
+pytest>=7.4,<10

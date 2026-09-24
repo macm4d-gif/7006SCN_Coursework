@@ -1,0 +1,23 @@
+{
+  "repository_url": "https://github.com/7006SCN2627SEPNOV/7006SCN_INITIALS_SID",
+  "branch": "main",
+  "ai_use_declaration": "WRITE_TRUTHFULLY: Identify Arena.ai Agent Mode and every other AI tool you actually used; describe code/text/figures/sections assisted; state what you personally reviewed, changed and verified. Never claim verification you have not completed.",
+  "sections": {
+    "1.1": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_1_1_PROBLEM_ALLOCATION_AND_REUSE_TERMS"},
+    "1.2": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_1_2_FIVE_VS_AND_ETHICS_INTERPRETATION"},
+    "1.3": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_1_3_PREPARATION_STAGE_ORDER_AND_LEAKAGE_ALTERNATIVES"},
+    "EP1": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_CAPTION_FOR_REAL_TASK1_EVIDENCE"},
+    "2.1": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_2_1_FOUR_ALGORITHM_AND_GRID_JUSTIFICATIONS"},
+    "2.2": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_2_2_CV_COMPUTE_AND_BEST_PARAMS_INTERPRETATION"},
+    "2.3": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_2_3_METRIC_TRADEOFF_AND_RECOMMENDATION"},
+    "EP2": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_CAPTION_FOR_REAL_TASK2_EVIDENCE"},
+    "3.1": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_3_1_STAGE_TIMELINE_AND_BEFORE_AFTER_DIAGNOSIS"},
+    "3.2": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_3_2_STABILITY_PER_MODEL_AND_DEPLOYMENT_IMPLICATION"},
+    "3.3": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_3_3_LIME_LIMITS_BOROUGH_PROXY_AND_MITIGATION"},
+    "4.1": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_4_1_FOUR_REAL_TABLEAU_DASHBOARDS_AND_DESIGN"},
+    "4.2": {"commit": "REALHASH", "text": "WRITE_YOUR_OWN_THREE_OBSERVATION_EVIDENCE_DECISION_INSIGHTS_AND_CRITICAL_REFLECTION"}
+  },
+  "references": [
+    "ADD_ONLY_REFERENCES_YOU_PERSONALLY_CHECKED"
+  ]
+}
