@@ -1,6 +1,6 @@
 # How this project mirrors `saiashishd/collegework` — and why it cannot be a clone
 
-Reference: `https://github.com/saiashishd/collegework` (user-provided). Its top level has a single Colab-style `Ashish_p_2202.ipynb`, `ashish_p_2202.py`, a README and **four separate packaged Tableau `.twbx` files** with collision-specific CSVs. Its notebook covers Spark setup, CSV ingestion, Parquet, feature engineering, caching, vectors, split, four regressors, one RF CrossValidator, EDA and plots. These are useful design ideas, **not valid evidence or directly reusable code for the new allocation**.
+
 
 | Reference stage | New TR-04 counterpart | Important change required by *this* brief |
 |---|---|---|
